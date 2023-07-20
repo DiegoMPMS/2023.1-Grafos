@@ -21,11 +21,12 @@ void adicionar_vertice_lista(lista_grafo *grafo, int indice, char *nome);
 void adicionar_aresta_lista(lista_grafo *grafo, int indice1, int indice2);
 void adicionar_vertice_ordenado(lista_vertice *vertice, char *nome);
 void remover_aresta_lista(lista_grafo *grafo, int indice1, int indice2);
+void remover_vertice(lista_vertice *vertice1, char *nome);
 bool isVizinho_lista(lista_grafo *grafo, int indice1, int indice2);
 int calcular_grau_vertice(lista_grafo *grafo, int indice);
-int buscar_vertice(lista_grafo *grafo, char *nome);
-void busca_em_profundidade(lista_grafo *grafo, int indice);
-void busca_em_profundidade_recursiva(lista_grafo *grafo, int indice);
+int buscar_indice_vertice(lista_grafo *grafo, char *nome);
+void buscar_em_profundidade(lista_grafo *grafo, int indice);
+void buscar_em_profundidade_recursiva(lista_grafo *grafo, int indice);
 void imprimir_lista_vertices(lista_grafo *grafo);
 void imprimir_lista(lista_grafo *grafo);
 void imprimir_profundidade(lista_grafo *grafo);
@@ -33,8 +34,13 @@ lista_grafo *subgrafo(lista_grafo *grafo, int *vertices, int tamanho_vertices,
                       int (*arestas)[2], int tamanho_arestas);
 lista_grafo *subgrafo_induzido(lista_grafo *grafo, int *vertices, int tamanho);
 lista_grafo *subtracao_vertices(lista_grafo *grafo, int *vertices, int tamanho);
-lista_grafo *subgrafo_aresta_induzido(lista_grafo *grafo, int **arestas,
-                                      int tamanho);
-lista_grafo *subtracao_arestas(lista_grafo *grafo, int **arestas, int tamanho);
+lista_grafo *subgrafo_aresta_induzido(lista_grafo *grafo, int (*arestas)[2],
+                                      int subgrafo_tamanho);
+lista_grafo *subtracao_arestas(lista_grafo *grafo, int (*arestas)[2],
+                               int tamanho);
+bool isDuplicate(int *uniqueArr, int size, int element);
+int *create_set_vertices(int (*arestas)[2], int size_arestas,
+                         int *size_set_vertices);
+lista_grafo *copiar_grafo(lista_grafo *grafo);
 
 #endif  // ESTRUTURA_H

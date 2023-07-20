@@ -1,3 +1,4 @@
+
 #include "estrutura.h"
 
 #include <stdbool.h>
@@ -73,33 +74,35 @@ void adicionar_vertice_ordenado(lista_vertice *vertice, char *nome) {
 }
 
 void remover_aresta_lista(lista_grafo *grafo, int indice1, int indice2) {
+  char *nome1 = strdup(grafo->vertice[indice1].nome);
+  char *nome2 = strdup(grafo->vertice[indice2].nome);
+
   lista_vertice *vertice1 = &(grafo->vertice[indice1]);
-
-  // Verificação se a aresta a ser removida é a primeira
-  if (vertice1->next != NULL &&
-      vertice1->next->nome == grafo->vertice[indice2].nome) {
-    lista_vertice *temp = vertice1->next;
-    vertice1->next = temp->next;
-    free(temp);
-  } else {
-    lista_vertice *current = vertice1->next;
-    lista_vertice *prev = vertice1;
-
-    // Percorre a lista de vizinhos do vértice1 para encontrar a aresta a ser
-    // removida
-    while (current != NULL && current->nome != grafo->vertice[indice2].nome) {
-      prev = current;
-      current = current->next;
-    }
-
-    // Se encontrou a aresta, remove
-    if (current != NULL) {
-      prev->next = current->next;
-      free(current);
-    }
-  }
+  lista_vertice *vertice2 = &(grafo->vertice[indice2]);
+  remover_vertice(vertice1, nome2);
+  remover_vertice(vertice2, nome1);
 }
 
+void remover_vertice(lista_vertice *vertice1, char *nome) {
+  lista_vertice *current = vertice1;
+  lista_vertice *prev = NULL;
+  current = current->next;
+
+  while (current != NULL && strcmp(current->nome, nome) != 0) {
+    prev = current;
+    current = current->next;
+  }
+
+  if (current == NULL) return;
+
+  if (prev == NULL) {
+    vertice1->next = current->next;
+  } else {
+    prev->next = current->next;
+  }
+
+  free(current);
+}
 bool isVizinho_lista(lista_grafo *grafo, int indice1, int indice2) {
   // Obtém o ponteiro para o vértice1 no índice1
   lista_vertice *vertice1 = &(grafo->vertice[indice1]);
@@ -146,7 +149,7 @@ int calcular_grau_vertice(lista_grafo *grafo, int indice) {
   return grau;
 }
 
-int buscar_vertice(lista_grafo *grafo, char *nome) {
+int buscar_indice_vertice(lista_grafo *grafo, char *nome) {
   // Percorre os vértices do grafo
   for (int i = 0; i < grafo->tamanho; i++) {
     // Verifica se o vértice no índice i possui um nome válido e se o nome
@@ -159,7 +162,7 @@ int buscar_vertice(lista_grafo *grafo, char *nome) {
   return -1;  // Retorna -1 se o vértice não foi encontrado
 }
 
-void busca_em_profundidade(lista_grafo *grafo, int indice) {
+void buscar_em_profundidade(lista_grafo *grafo, int indice) {
   contador_entrada = 1;
   contador_saida = 1;
 
@@ -177,7 +180,7 @@ void busca_em_profundidade(lista_grafo *grafo, int indice) {
   busca_em_profundidade_recursiva(grafo, indice);
 }
 
-void busca_em_profundidade_recursiva(lista_grafo *grafo, int indice) {
+void buscar_em_profundidade_recursiva(lista_grafo *grafo, int indice) {
   // Obtém o ponteiro para o vértice de índice fornecido
   lista_vertice *current = &(grafo->vertice[indice]);
 
@@ -192,7 +195,7 @@ void busca_em_profundidade_recursiva(lista_grafo *grafo, int indice) {
   // Percorre os vizinhos do vértice atual
   while (current->next != NULL) {
     // Obtém o índice do próximo vértice a ser visitado
-    int tmp_indice = buscar_vertice(grafo, current->next->nome);
+    int tmp_indice = buscar_indice_vertice(grafo, current->next->nome);
 
     // Verifica se o vértice ainda não foi visitado
     if (!grafo->vertice[tmp_indice].marcado) {
@@ -225,14 +228,14 @@ void imprimir_lista_vertices(lista_grafo *grafo) {
 }
 
 void imprimir_lista(lista_grafo *grafo) {
-  printf("== Grafo em lista encadeada\n");
+  printf("\n=== Grafo em lista encadeada\n");
   int numvertices = 0;
   for (int i = 0; i < grafo->tamanho; i++) {
     if (grafo->vertice[i].nome != NULL) {
       numvertices += 1;
     }
   }
-  printf("Numero de vertices:%d\n", numvertices);
+  printf("Numero de vertices: %d\n", numvertices);
 
   int num_grau_vertices = 0;
   for (int i = 0; i < grafo->tamanho; i++) {
@@ -249,7 +252,7 @@ void imprimir_lista(lista_grafo *grafo) {
     }
   }
 
-  printf("Lista de adjacencia\n");
+  printf("= Lista de adjacencia\n");
   imprimir_lista_vertices(grafo);
 }
 
@@ -284,18 +287,19 @@ lista_grafo *subgrafo(lista_grafo *grafo, int *vertices, int tamanho_vertices,
   return subgrafo;
 }
 
-lista_grafo *subgrafo_induzido(lista_grafo *grafo, int *vertices, int tamanho) {
+lista_grafo *subgrafo_induzido(lista_grafo *grafo, int *vertices,
+                               int subgrafo_tamanho) {
   // Criar um novo grafo
-  lista_grafo *subgrafo = criar_lista(tamanho);
+  lista_grafo *subgrafo = criar_lista(subgrafo_tamanho);
 
   // Adicionar os vértices do subgrafo
-  for (int i = 0; i < tamanho; i++) {
+  for (int i = 0; i < subgrafo_tamanho; i++) {
     adicionar_vertice_lista(subgrafo, i, grafo->vertice[vertices[i]].nome);
   }
 
   // Adicionar as arestas do subgrafo
-  for (int i = 0; i < tamanho; i++) {
-    for (int j = i + 1; j < tamanho; j++) {
+  for (int i = 0; i < subgrafo_tamanho; i++) {
+    for (int j = i + 1; j < subgrafo_tamanho; j++) {
       if (isVizinho_lista(grafo, vertices[i], vertices[j])) {
         adicionar_aresta_lista(subgrafo, i, j);
       }
@@ -306,18 +310,21 @@ lista_grafo *subgrafo_induzido(lista_grafo *grafo, int *vertices, int tamanho) {
 }
 
 lista_grafo *subtracao_vertices(lista_grafo *grafo, int *vertices,
-                                int tamanho) {
-  lista_grafo *subgrafo = criar_lista(grafo->tamanho - tamanho);
+                                int novo_tamanho) {
+  // criar um novo grafo
+  lista_grafo *subgrafo = criar_lista(grafo->tamanho - novo_tamanho);
 
-  char **nomes = malloc(tamanho * sizeof(char *));
-  for (int i = 0; i < tamanho; i++) {
+  // Procura os vértices que não estão no subgrafo e adiciona em conjunto com
+  // suas respectivas arestas
+  char **nomes = malloc(novo_tamanho * sizeof(char *));
+  for (int i = 0; i < novo_tamanho; i++) {
     nomes[i] = grafo->vertice[vertices[i]].nome;
   }
 
   int size_used = 0;
   for (int i = 0; i < grafo->tamanho; i++) {
     bool grafo_vertice_encontrado = false;
-    for (int j = 0; j < tamanho; j++) {
+    for (int j = 0; j < novo_tamanho; j++) {
       if (strcmp(grafo->vertice[i].nome, nomes[j]) == 0) {
         grafo_vertice_encontrado = true;
         break;
@@ -333,7 +340,7 @@ lista_grafo *subtracao_vertices(lista_grafo *grafo, int *vertices,
       while (current != NULL) {
         bool grafo_vertice_encontrado_nas_arestas = false;
 
-        for (int j = 0; j < tamanho; j++) {
+        for (int j = 0; j < novo_tamanho; j++) {
           if (strcmp(current->nome, nomes[j]) == 0) {
             grafo_vertice_encontrado_nas_arestas = true;
             break;
@@ -350,47 +357,96 @@ lista_grafo *subtracao_vertices(lista_grafo *grafo, int *vertices,
   return subgrafo;
 }
 
-lista_grafo *subgrafo_aresta_induzido(lista_grafo *grafo, int **arestas,
-                                      int tamanho) {
+bool isDuplicate(int *uniqueArr, int size, int element) {
+  for (int i = 0; i < size; i++) {
+    if (uniqueArr[i] == element) return true;
+  }
+  return false;
+}
+
+int *create_set_vertices(int (*arestas)[2], int size_arestas, int *size) {
+  int *set_vertices = malloc(2 * size_arestas * sizeof(int));
+  int size_set_vertices = 0;
+
+  // Procura por duplicados e adiciona apenas os únicos elementos no array
+  for (int i = 0; i < size_arestas; i++) {
+    int vertice1 = arestas[i][0];
+    int vertice2 = arestas[i][1];
+    bool duplicate1 = isDuplicate(set_vertices, size_set_vertices, vertice1);
+    bool duplicate2 = isDuplicate(set_vertices, size_set_vertices, vertice2);
+
+    if (!duplicate1) {
+      set_vertices[size_set_vertices] = vertice1;
+      size_set_vertices++;
+    }
+
+    if (vertice1 != vertice2 && !duplicate2) {
+      set_vertices[size_set_vertices] = vertice2;
+      size_set_vertices++;
+    }
+  }
+
+  *(size) = size_set_vertices;
+  return set_vertices;
+}
+
+lista_grafo *subgrafo_aresta_induzido(lista_grafo *grafo, int (*arestas)[2],
+                                      int subgrafo_tamanho) {
+  // Criar uma lista de quais vertices adicionar no novo subgrafo
+  int size_set_vertices;
+  int *set_vertices =
+      create_set_vertices(arestas, subgrafo_tamanho, &size_set_vertices);
+
   // Criar um novo grafo
-  lista_grafo *subgrafo = criar_lista(grafo->tamanho);
+  lista_grafo *subgrafo = criar_lista(size_set_vertices);
 
   // Adicionar os vértices do subgrafo
-  for (int i = 0; i < grafo->tamanho; i++) {
-    adicionar_vertice_lista(subgrafo, i, grafo->vertice[i].nome);
+  for (int i = 0; i < size_set_vertices; i++) {
+    adicionar_vertice_lista(subgrafo, i, grafo->vertice[set_vertices[i]].nome);
   }
 
   // Adicionar as arestas do subgrafo
-  for (int i = 0; i < tamanho; i++) {
-    adicionar_aresta_lista(subgrafo, arestas[i][0], arestas[i][1]);
+  for (int i = 0; i < subgrafo_tamanho; i++) {
+    int vertice1 = arestas[i][0];
+    int vertice2 = arestas[i][1];
+    int indice_vertice1 =
+        buscar_indice_vertice(grafo, grafo->vertice[vertice1].nome);
+    int indice_vertice2 =
+        buscar_indice_vertice(grafo, grafo->vertice[vertice2].nome);
+
+    adicionar_aresta_lista(subgrafo, indice_vertice1, indice_vertice2);
+  }
+
+  free(set_vertices);
+  return subgrafo;
+}
+
+lista_grafo *copiar_grafo(lista_grafo *grafo) {
+  // copiar o grafo
+  lista_grafo *subgrafo = criar_lista(grafo->tamanho);
+
+  for (int i = 0; i < grafo->tamanho; i++) {
+    adicionar_vertice_lista(subgrafo, i, grafo->vertice[i].nome);
+    lista_vertice *current = &(grafo->vertice[i]);
+    lista_vertice *current_subgrafo = &(subgrafo->vertice[i]);
+    current = current->next;
+    while (current != NULL) {
+      adicionar_vertice_ordenado(current_subgrafo, current->nome);
+      current = current->next;
+    }
   }
 
   return subgrafo;
 }
 
-lista_grafo *subtracao_arestas(lista_grafo *grafo, int **arestas, int tamanho) {
+lista_grafo *subtracao_arestas(lista_grafo *grafo, int (*arestas)[2],
+                               int subgrafo_tamanho) {
   // Criar um novo grafo
-  lista_grafo *subgrafo = criar_lista(grafo->tamanho);
+  lista_grafo *subgrafo = copiar_grafo(grafo);
 
-  // Adicionar os vértices do subgrafo
-  for (int i = 0; i < grafo->tamanho; i++) {
-    adicionar_vertice_lista(subgrafo, i, grafo->vertice[i].nome);
-  }
-
-  // Adicionar as arestas do subgrafo
-  for (int i = 0; i < grafo->tamanho; i++) {
-    for (int j = i + 1; j < grafo->tamanho; j++) {
-      if (isVizinho_lista(grafo, i, j)) {
-        adicionar_aresta_lista(subgrafo, i, j);
-      }
-    }
-  }
-
-  // Remover as arestas do subgrafo
-  for (int i = 0; i < tamanho; i++) {
+  for (int i = 0; i < subgrafo_tamanho; i++) {
     remover_aresta_lista(subgrafo, arestas[i][0], arestas[i][1]);
   }
 
   return subgrafo;
 }
-
