@@ -1,7 +1,7 @@
 #include "estrutura.h"
 #include "matriz.h"
 
-void testarMatriz()
+void exercicio1()
 {
   matriz_grafo *matrizGrafo = criar_matriz(5);
 
@@ -20,11 +20,11 @@ void testarMatriz()
   adicionar_aresta_matriz(matrizGrafo, 2, 3);
   adicionar_aresta_matriz(matrizGrafo, 3, 4);
 
-  imprima_matriz(matrizGrafo);
+  imprimir_matriz(matrizGrafo);
   free(matrizGrafo);
 }
 
-void testarEstrutura()
+void exercicio3()
 {
   lista_grafo *listaGrafo = criar_lista(8);
 
@@ -51,18 +51,55 @@ void testarEstrutura()
   adicionar_aresta_lista(listaGrafo, 5, 7); // (f,h)
   adicionar_aresta_lista(listaGrafo, 7, 5); // (f,h)
 
-  imprima_lista(listaGrafo);
-  
+  imprimir_lista(listaGrafo);
+
   // busca em profundidade
   busca_em_profundidade(listaGrafo, 0);
-  imprima_profundidade(listaGrafo);
+  imprimir_profundidade(listaGrafo);
 
   free(listaGrafo);
 }
 
+void exercicio4() {
+  lista_grafo *G = criar_lista(5);
+  adicionar_vertice_lista(G, 0, "u");
+  adicionar_vertice_lista(G, 1, "y");
+  adicionar_vertice_lista(G, 2, "x");
+  adicionar_vertice_lista(G, 3, "w");
+  adicionar_vertice_lista(G, 4, "v");
+
+  adicionar_aresta_lista(G, 0, 1);  // (u,y)
+  adicionar_aresta_lista(G, 0, 4);  // (u,v)
+  adicionar_aresta_lista(G, 4, 3);  // (v,w)
+  adicionar_aresta_lista(G, 4, 1);  // (v,y)
+  adicionar_aresta_lista(G, 4, 1);  // (v,y)
+  adicionar_aresta_lista(G, 3, 1);  // (w,y)
+  adicionar_aresta_lista(G, 1, 2);  // (y,x)
+  adicionar_aresta_lista(G, 2, 3);  // (x,w)
+
+  imprimir_lista(G);
+
+  // int vertices_subgrafo[] = {0, 1, 2};
+  // int size_vertices_subgrafo = sizeof(vertices_subgrafo) /
+  // sizeof(vertices_subgrafo[0]); int arestas_subgrafo[][2] = {{0, 1}, {0, 2},
+  // {2, 1}}; int size_arestras_subgrafo = sizeof(arestas_subgrafo) /
+  // sizeof(arestas_subgrafo[0]); lista_grafo *subgrafo_gerador = subgrafo(G,
+  // vertices_subgrafo, size_vertices_subgrafo, arestas_subgrafo,
+  // size_arestras_subgrafo); imprimir_lista(subgrafo_gerador);
+
+  int X1[] = {1, 4, 2, 0};
+  int size_X1 = sizeof(X1) / sizeof(X1[0]);
+  lista_grafo *grafo_X1 = subgrafo_induzido(G, X1, size_X1);
+  imprimir_lista(grafo_X1);
+
+  int X2[] = {0, 3};
+  int size_X2 = sizeof(X2) / sizeof(X2[0]);
+  lista_grafo *grafo_X2 = subtracao_vertices(G, X2, size_X2);
+  imprimir_lista(grafo_X2);
+}
+
 int main()
 {
-  testarEstrutura();
-
+  exercicio4();
   return 0;
 }

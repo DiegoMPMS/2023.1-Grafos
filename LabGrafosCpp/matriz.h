@@ -26,6 +26,6 @@ void adicionar_vertice_matriz(matriz_grafo* grafo, int indice, const char* nome)
 void adicionar_aresta_matriz(matriz_grafo* grafo, int vertice1, int vertice2);
 void remover_aresta_matriz(matriz_grafo* grafo, int vertice1, int vertice2);
 bool isVizinho_matriz(matriz_grafo* grafo, int vertice1, int vertice2);
-void imprima_matriz(matriz_grafo* grafo);
+void imprimir_matriz(matriz_grafo* grafo);
 
 #endif // MATRIZ_H

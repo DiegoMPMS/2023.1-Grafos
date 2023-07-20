@@ -75,7 +75,7 @@ bool isVizinho_matriz(matriz_grafo *grafo, int vertice1, int vertice2)
          grafo->matriz[vertice2][vertice1] == grafo->matriz[vertice1][vertice2];
 }
 
-void imprima_matriz(matriz_grafo *grafo)
+void imprimir_matriz(matriz_grafo *grafo)
 {
   printf("== Grafo em matriz\n");
 
